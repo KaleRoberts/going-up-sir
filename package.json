@@ -1,0 +1,28 @@
+{
+  "name": "going-up-sir",
+  "version": "1.0.0",
+  "description": "Elevator Traversal",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/KaleRoberts/going-up-sir.git"
+  },
+  "keywords": [
+    "traveling-salesman",
+    "Dijkstras-algorithm",
+    "JavaScript"
+  ],
+  "author": "Kale Roberts",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/KaleRoberts/going-up-sir/issues"
+  },
+  "homepage": "https://github.com/KaleRoberts/going-up-sir#readme",
+  "dependencies": {
+    "jasmine": "^3.6.1",
+    "mocha": "^8.1.3"
+  }
+}
