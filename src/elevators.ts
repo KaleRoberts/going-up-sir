@@ -13,9 +13,9 @@
     But there could be issues with this approach
 
     const path = ['A', 'D'];
-    
+
     Thought about trying to, "merge" the states/array indicies and give a given elevator coordinates
-    E.g. 
+    E.g.
         xx.x.x.xDxx
         xx.x.x.x.xx
         xx.x.x.x.xx
@@ -32,3 +32,66 @@
 
 
 */
+
+export interface FindElevatorPathParams {
+    states: string [];
+    start: string;
+    final: string;
+}
+
+const elevatorStates: string[] = [
+    // State @ t=1
+    `xx.x.x.xDxx
+     xx.x.x.x.xx
+     xx.x.x.x.xx
+     xx.xBx.x.xx
+     xx.x.xCx.xx
+     xxAx.x.x.xx`,
+    // State @ t=2
+    `xx.x.x.x.xx
+     xx.x.x.x.xx
+     xxAx.x.x.xx
+     xx.xBx.x.xx
+     xx.x.xCx.xx
+     xx.x.x.xDxx`,
+    // State @ t=3
+    `xx.x.xCx.xx
+     xx.x.x.x.xx
+     xx.x.x.x.xx
+     xxAxBx.x.xx
+     xx.x.x.x.xx
+     xx.x.x.xDxx`,
+    // State @ t=4
+    `xx.x.xCx.xx
+     xx.x.x.x.xx
+     xx.xBx.xDxx
+     xx.x.x.x.xx
+     xxAx.x.x.xx
+     xx.x.x.x.xx`,
+     // State @ t=5
+    `xx.x.xCx.xx
+     xx.x.x.xDxx
+     xx.x.x.x.xx
+     xx.x.x.x.xx
+     xxAxBx.x.xx
+     xx.x.x.x.xx`
+];
+
+
+export const findElevatorPath = (params: FindElevatorPathParams): string => {
+
+    const {states, start, final} = params;
+
+    const merge = {};
+    states.map((state) => {
+        
+    })
+
+    return "AABBCCDD";
+}
+
+findElevatorPath({
+    states: elevatorStates,
+    start: "A",
+    final: "5-5"
+});
