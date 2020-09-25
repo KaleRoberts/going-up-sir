@@ -5,8 +5,7 @@
     Quick checks - are we already in the desired position?
         - Can we even satisfy the condition given the state of the elevators?
 
-    Could work backwards from the known beginning and known end
-    since we know the start and the end.
+    Could work backwards from the known end
     If you start in elevator A, and need to get to floor 5 by t=5 then
     you wouldn't want to go back down to floor 1 because you'd run out
     of steps to get to floor 5
@@ -27,11 +26,13 @@
     C is (1, 2) again t=1 and C is on the second floor
     B is (1, 3)
 
-    So if we were to, "merge" all of the states together we could assign coordinates
+    So if we were to, "merge" all of the states together we could possibly assign coordinates
     to every elevator position
 
 
 */
+
+import { setSourceMapRange } from "typescript";
 
 export interface FindElevatorPathParams {
     states: string [];
@@ -86,7 +87,7 @@ const elevatorStates: string[] = [
   'xx.x.xCx.xx\nxx.x.x.x.xx\nxx.xBx.xDxx\nxx.x.x.x.xx\nxxAx.x.x.xx\nxx.x.x.x.xx',
   'xx.x.xCx.xx\nxx.x.x.xDxx\nxx.x.x.x.xx\nxx.x.x.x.xx\nxxAxBx.x.xx\nxx.x.x.x.xx' ]
 
-export const findElevatorPath = (params: FindElevatorPathParams): string => {
+export const findElevatorPath = (params: FindElevatorPathParams): string[] => {
     const {states, start, final} = params;
 
     const elevators = /ABCD/gi
@@ -101,7 +102,6 @@ export const findElevatorPath = (params: FindElevatorPathParams): string => {
 
     // Could determine floor level by index range
     // if index between 0 and 11 then its on the first floor
-
     /*
         Index mappings
         0 - 10 is floor 6
@@ -137,29 +137,32 @@ export const findElevatorPath = (params: FindElevatorPathParams): string => {
         return floor;
     }
 
+    let positions = {};
 
-    // let state1 = {
-    //     A: mapFloor(cleandUpStates[0].indexOf("A")),
-    //     B: mapFloor(cleandUpStates[0].indexOf("B")),
-    //     C: mapFloor(cleandUpStates[0].indexOf("C")),
-    //     D: mapFloor(cleandUpStates[0].indexOf("D"))
-    // }  
-
-    // console.log(state1.A);
-    // console.log(state1.B);
-    // console.log(state1.C);
-    // console.log(state1.D);
-
-    let state = {}
+    // Is there another elevator on the same floor as me in the next time interval?
+    // If there isn't then you have to stay in the same elevator until there is another at your floor
+    const checkForNextElevator = (start, time, positions, finalFloor) => {
+        let nextElevator;
+        for(const prop in positions) {          
+            if(prop !== `${start}${time}`) {    //Don't check the same key
+                if((positions[`${start}${time}`] === positions[prop])){
+                    console.log('The next elevator is', prop);
+                    steps.push(prop);
+                    nextElevator = prop;    
+                }
+            } 
+        }
+        return nextElevator;
+    }
 
     // Time interval 1 is now 0
     // Establish where each elevator is at a given time interval
 
     for(let i = 0; i < cleandUpStates.length; i++) {
-        state["A" + i] = mapFloor(cleandUpStates[i].indexOf("A"));
-        state["B" + i] = mapFloor(cleandUpStates[i].indexOf("B"));
-        state["C" + i] = mapFloor(cleandUpStates[i].indexOf("C"));
-        state["D" + i] = mapFloor(cleandUpStates[i].indexOf("D"));
+        positions["A" + i] = mapFloor(cleandUpStates[i].indexOf("A"));
+        positions["B" + i] = mapFloor(cleandUpStates[i].indexOf("B"));
+        positions["C" + i] = mapFloor(cleandUpStates[i].indexOf("C"));
+        positions["D" + i] = mapFloor(cleandUpStates[i].indexOf("D"));
     }
     
 
@@ -170,31 +173,43 @@ export const findElevatorPath = (params: FindElevatorPathParams): string => {
     */
 
     let steps:string [] = [];
-    const finalElevator = final.charAt(2);
-    const finalTime = final.charAt(0);
+    const finalFloor = +final.charAt(0);
+    const finalTime: number = +final.charAt(2);
+    
+
+    steps.push(start);
+    let currentElevator = start;
+    checkForNextElevator(currentElevator, 0, positions, finalFloor);
+    for(let time = 0; time < finalTime - 1; time++) {
+        currentElevator = checkForNextElevator(currentElevator, time + 1, positions, finalFloor); // A1
+    }
 
 
+    // if(positions[`${start}`+ `${i + 1}`] getStartingFloor(start,positions))
 
-    /*
-    Quick representation of what our state object looks like
-        state {
-            A0: 1
-            B0: 3
-            C0: 999
-            D0: 999
-            A1:
-            B1:
-            C1:
-            D1:
 
-        }
-    */
+    // What is the elevator in the last position?
+    // for(const prop in positions) {
+    //     console.log(`${prop} : ${positions[prop]}`);
+    //     if(positions[prop] === finalFloor) {
+    //         console.log(`The final elevator is ${prop} on floor ${finalFloor}`)
+    //     }
+    // }
 
-    console.log(state["A0"]);
-    console.log(state["B0"]);
-    console.log(state["C4"]);
+    // Then it becomes how to get from A to D?
 
-    return "AABBDD";
+    // console.log(positions[`A`+`${finalTime - 1}`]);
+
+    // if(state[`${finalElevator}+${finalTime - 1}`]) {
+        
+    // }
+
+    // console.log(positions["A0"]);
+    // console.log(positions["B0"]);
+    // console.log(positions["C4"]);
+
+ 
+    return steps;
 }
 
 console.log(findElevatorPath({

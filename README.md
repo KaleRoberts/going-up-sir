@@ -95,3 +95,30 @@ finalDestination = "5-5"
 
 Sample Output:
 "AABDD"
+
+
+    /*
+    Quick representation of what our positions object looks like
+        state {
+          A0 : 1
+          B0 : 3
+          C0 : 2
+          D0 : 6
+          A1 : 4
+          B1 : 3
+          C1 : 2
+          D1 : 1
+          A2 : 3
+          B2 : 3
+          C2 : 6
+          D2 : 1
+          A3 : 2
+          B3 : 4
+          C3 : 6
+          D3 : 4
+          A4 : 2
+          B4 : 2
+          C4 : 6
+          D4 : 5
+        }
+    */
