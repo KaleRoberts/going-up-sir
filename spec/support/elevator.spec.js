@@ -50,7 +50,7 @@ describe('Elevator path finder functionality', () => {
             start,
             final
         };
-        expect(src_1.findElevatorPath(params)).toEqual("AABBCCDD");
+        expect(src_1.findElevatorPath(params)).toEqual("AABDD");
     });
 });
 //# sourceMappingURL=elevator.spec.js.map

@@ -52,7 +52,7 @@ describe('Elevator path finder functionality', () => {
             final
         }
 
-        expect(findElevatorPath(params)).toEqual("AABBCCDD");
+        expect(findElevatorPath(params)).toEqual("AABDD");
 
     })
 })

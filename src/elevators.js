@@ -1,4 +1,9 @@
 "use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.findElevatorPath = void 0;
 /*
     elevator.ts
     Add solutions in here
@@ -31,8 +36,7 @@
 
 
 */
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.findElevatorPath = void 0;
+const lodash_1 = __importDefault(require("lodash"));
 const elevatorStates = [
     // State @ t=1
     `xx.x.x.xDxx
@@ -121,18 +125,47 @@ exports.findElevatorPath = (params) => {
     };
     let positions = {};
     // Is there another elevator on the same floor as me in the next time interval?
-    // If there isn't then you have to stay in the same elevator
-    const checkForNextElevator = (start, time, positions) => {
+    // If there isn't then you have to stay in the same elevator until there is another at your floor
+    // Current problem is that I can't check against the same time
+    // If there is an elevator at the same time on my current floor do you get in it?
+    const checkForNextElevator = (start, time, positions, finalFloor) => {
         let nextElevator;
-        for (const prop in positions) {
-            if (prop !== `${start}${time}`) { //Don't check the same key
-                if ((positions[`${start}${time}`] === positions[prop])) {
-                    console.log('The next elevator is', prop);
-                    steps.push(prop);
-                    nextElevator = prop;
-                }
+        const nextPositions = lodash_1.default.omit(positions, [`${start}${time}`]);
+        for (const prop in nextPositions) {
+            if ((positions[`${start}${time}`] === nextPositions[`${prop.charAt(0)}${prop.charAt(1)}`])) {
+                console.log(`Checking`, `${start}${time}`, (positions[`${start}${time}`]), `${prop}`, (nextPositions[`${prop.charAt(0)}${prop.charAt(1)}`]));
+                console.log('The next elevator is', prop);
+                steps.push(prop);
+                nextElevator = prop;
+            }
+            else {
+                steps.push(`${start}${time}`);
+                nextElevator = `${start}${time}`;
             }
         }
+        // for(const prop in positions) {          
+        //     // if(prop !== `${start}${time}`) {    //Don't check the same key
+        //     // if((positions[`${start}${time}`] === positions[prop])){
+        //     //     delete(positions[prop]);
+        //     // }
+        //     const nextPositions = _.omit(positions, [`${currentElevator}${time}`]);
+        //     if((positions[`${start}${time}`] === nextPositions[`${prop}${time}`])) {
+        //         console.log(`Checking`, `${start}${time}`, (positions[`${start}${time}`]),  `${prop}`, (positions[prop]));
+        //         console.log('The next elevator is', prop);
+        //         steps.push(prop);
+        //         nextElevator = prop;    
+        //     } else {
+        //         steps.push(`${start}${time}`);
+        //         nextElevator = `${start}${time}`;
+        //     }
+        //     // if((positions[`${start}${time}`] === positions[prop])){
+        //     //     console.log(`Checking`, `${start}${time}`, (positions[`${start}${time}`]),  `${prop}`, (positions[prop]));
+        //     //     console.log('The next elevator is', prop);
+        //     //     steps.push(prop);
+        //     //     nextElevator = prop;    
+        //     // }
+        //     // } 
+        // }
         return nextElevator;
     };
     // Time interval 1 is now 0
@@ -150,15 +183,15 @@ exports.findElevatorPath = (params) => {
     */
     let steps = [];
     const finalFloor = +final.charAt(0);
-    const finalTime = +final.charAt(2);
+    let finalTime = +final.charAt(2);
+    finalTime = finalTime - 1;
     steps.push(start);
     let currentElevator = start;
-    checkForNextElevator(currentElevator, 0, positions);
-    for (let time = 0; time < finalTime - 1; time++) {
-        // if(positions[`${start}`+`${i + 1}`] > getStartingFloor(start, positions)) {
-        //     steps.push(start);
-        // }
-        currentElevator = checkForNextElevator(currentElevator, time + 1, positions); // A1
+    // checkForNextElevator(currentElevator, 0, positions, finalFloor);
+    // const nextPositions = _.omit(positions, ['A0']);
+    // console.log(nextPositions);
+    for (let time = 0; time < finalTime; time++) {
+        currentElevator = checkForNextElevator(currentElevator, time, positions, finalFloor);
     }
     // if(positions[`${start}`+ `${i + 1}`] getStartingFloor(start,positions))
     // What is the elevator in the last position?
@@ -172,10 +205,7 @@ exports.findElevatorPath = (params) => {
     // console.log(positions[`A`+`${finalTime - 1}`]);
     // if(state[`${finalElevator}+${finalTime - 1}`]) {
     // }
-    // console.log(positions["A0"]);
-    // console.log(positions["B0"]);
-    // console.log(positions["C4"]);
-    return steps;
+    return steps.join();
 };
 console.log(exports.findElevatorPath({
     states: elevatorStates,

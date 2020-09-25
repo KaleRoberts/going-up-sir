@@ -31,9 +31,7 @@
 
 
 */
-
-import { setSourceMapRange } from "typescript";
-
+import _ from 'lodash';
 export interface FindElevatorPathParams {
     states: string [];
     start: string;
@@ -87,7 +85,7 @@ const elevatorStates: string[] = [
   'xx.x.xCx.xx\nxx.x.x.x.xx\nxx.xBx.xDxx\nxx.x.x.x.xx\nxxAx.x.x.xx\nxx.x.x.x.xx',
   'xx.x.xCx.xx\nxx.x.x.xDxx\nxx.x.x.x.xx\nxx.x.x.x.xx\nxxAxBx.x.xx\nxx.x.x.x.xx' ]
 
-export const findElevatorPath = (params: FindElevatorPathParams): string[] => {
+export const findElevatorPath = (params: FindElevatorPathParams): string => {
     const {states, start, final} = params;
 
     const elevators = /ABCD/gi
@@ -141,17 +139,49 @@ export const findElevatorPath = (params: FindElevatorPathParams): string[] => {
 
     // Is there another elevator on the same floor as me in the next time interval?
     // If there isn't then you have to stay in the same elevator until there is another at your floor
+
+    // Current problem is that I can't check against the same time
+    // If there is an elevator at the same time on my current floor do you get in it?
     const checkForNextElevator = (start, time, positions, finalFloor) => {
         let nextElevator;
-        for(const prop in positions) {          
-            if(prop !== `${start}${time}`) {    //Don't check the same key
-                if((positions[`${start}${time}`] === positions[prop])){
-                    console.log('The next elevator is', prop);
-                    steps.push(prop);
-                    nextElevator = prop;    
-                }
-            } 
+        const nextPositions = _.omit(positions, [`${start}${time}`]);
+
+        for(const prop in nextPositions) {
+            if((positions[`${start}${time}`] === nextPositions[`${prop.charAt(0)}${prop.charAt(1)}`])) {
+                console.log(`Checking`, `${start}${time}`, (positions[`${start}${time}`]),  `${prop}`, (nextPositions[`${prop.charAt(0)}${prop.charAt(1)}`]));
+                console.log('The next elevator is', prop);
+                steps.push(prop);
+                nextElevator = prop;    
+            } else {
+                steps.push(`${start}${time}`);
+                nextElevator = `${start}${time}`;
+            }
         }
+        // for(const prop in positions) {          
+        //     // if(prop !== `${start}${time}`) {    //Don't check the same key
+        //     // if((positions[`${start}${time}`] === positions[prop])){
+        //     //     delete(positions[prop]);
+        //     // }
+
+        //     const nextPositions = _.omit(positions, [`${currentElevator}${time}`]);
+
+        //     if((positions[`${start}${time}`] === nextPositions[`${prop}${time}`])) {
+        //         console.log(`Checking`, `${start}${time}`, (positions[`${start}${time}`]),  `${prop}`, (positions[prop]));
+        //         console.log('The next elevator is', prop);
+        //         steps.push(prop);
+        //         nextElevator = prop;    
+        //     } else {
+        //         steps.push(`${start}${time}`);
+        //         nextElevator = `${start}${time}`;
+        //     }
+        //     // if((positions[`${start}${time}`] === positions[prop])){
+        //     //     console.log(`Checking`, `${start}${time}`, (positions[`${start}${time}`]),  `${prop}`, (positions[prop]));
+        //     //     console.log('The next elevator is', prop);
+        //     //     steps.push(prop);
+        //     //     nextElevator = prop;    
+        //     // }
+        //     // } 
+        // }
         return nextElevator;
     }
 
@@ -174,14 +204,20 @@ export const findElevatorPath = (params: FindElevatorPathParams): string[] => {
 
     let steps:string [] = [];
     const finalFloor = +final.charAt(0);
-    const finalTime: number = +final.charAt(2);
+    let finalTime: number = +final.charAt(2);
+    finalTime = finalTime - 1;
     
 
     steps.push(start);
     let currentElevator = start;
-    checkForNextElevator(currentElevator, 0, positions, finalFloor);
-    for(let time = 0; time < finalTime - 1; time++) {
-        currentElevator = checkForNextElevator(currentElevator, time + 1, positions, finalFloor); // A1
+    // checkForNextElevator(currentElevator, 0, positions, finalFloor);
+
+    // const nextPositions = _.omit(positions, ['A0']);
+    // console.log(nextPositions);
+
+    for(let time = 0; time < finalTime; time++) {
+
+        currentElevator = checkForNextElevator(currentElevator, time, positions, finalFloor);
     }
 
 
@@ -203,13 +239,8 @@ export const findElevatorPath = (params: FindElevatorPathParams): string[] => {
     // if(state[`${finalElevator}+${finalTime - 1}`]) {
         
     // }
-
-    // console.log(positions["A0"]);
-    // console.log(positions["B0"]);
-    // console.log(positions["C4"]);
-
  
-    return steps;
+    return steps.join();
 }
 
 console.log(findElevatorPath({
