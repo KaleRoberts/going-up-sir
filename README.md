@@ -1,6 +1,12 @@
 # going-up-sir
 Elevator traversal
 
+# How to run/start
+yarn start or npm start
+
+# How to test
+yarn test or npm test
+
 
 ## The Elevator Problem
 
@@ -86,9 +92,6 @@ elevatorStates = [
 
 startingElevator = "A"
 finalDestination = "5-5"
-
-
-
 
 Sample Output:
 "AABDD"

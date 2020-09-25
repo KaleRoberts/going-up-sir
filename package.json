@@ -4,7 +4,9 @@
   "description": "Elevator Traversal",
   "main": "index.js",
   "scripts": {
-    "test": "jasmine-ts --config=./spec/support/jasmine.json"
+    "test": "jasmine-ts --config=./spec/support/jasmine.json",
+    "tsc": "tsc",
+    "start": "tsc && node ./src/elevators.js"
   },
   "repository": {
     "type": "git",
