@@ -1,4 +1,3 @@
-
 /*
     elevator.ts
     Add solutions in here
@@ -31,59 +30,20 @@
 
 
 */
-import _ from 'lodash';
 export interface FindElevatorPathParams {
     states: string [];
     start: string;
     final: string;
 }
 
-const elevatorStates: string[] = [
-    // State @ t=1
-    `xx.x.x.xDxx
-     xx.x.x.x.xx
-     xx.x.x.x.xx
-     xx.xBx.x.xx
-     xx.x.xCx.xx
-     xxAx.x.x.xx`,
-    // State @ t=2
-    `xx.x.x.x.xx
-     xx.x.x.x.xx
-     xxAx.x.x.xx
-     xx.xBx.x.xx
-     xx.x.xCx.xx
-     xx.x.x.xDxx`,
-    // State @ t=3
-    `xx.x.xCx.xx
-     xx.x.x.x.xx
-     xx.x.x.x.xx
-     xxAxBx.x.xx
-     xx.x.x.x.xx
-     xx.x.x.xDxx`,
-    // State @ t=4
-    `xx.x.xCx.xx
-     xx.x.x.x.xx
-     xx.xBx.xDxx
-     xx.x.x.x.xx
-     xxAx.x.x.xx
-     xx.x.x.x.xx`,
-     // State @ t=5
-    `xx.x.xCx.xx
-     xx.x.x.xDxx
-     xx.x.x.x.xx
-     xx.x.x.x.xx
-     xxAxBx.x.xx
-     xx.x.x.x.xx`
-];
-
 // CleanedUpStates
 //            11           23           35           47           59
 
-[ 'xx.x.x.xDxx\nxx.x.x.x.xx\nxx.x.x.x.xx\nxx.xBx.x.xx\nxx.x.xCx.xx\nxxAx.x.x.xx',
-  'xx.x.x.x.xx\nxx.x.x.x.xx\nxxAx.x.x.xx\nxx.xBx.x.xx\nxx.x.xCx.xx\nxx.x.x.xDxx',
-  'xx.x.xCx.xx\nxx.x.x.x.xx\nxx.x.x.x.xx\nxxAxBx.x.xx\nxx.x.x.x.xx\nxx.x.x.xDxx',
-  'xx.x.xCx.xx\nxx.x.x.x.xx\nxx.xBx.xDxx\nxx.x.x.x.xx\nxxAx.x.x.xx\nxx.x.x.x.xx',
-  'xx.x.xCx.xx\nxx.x.x.xDxx\nxx.x.x.x.xx\nxx.x.x.x.xx\nxxAxBx.x.xx\nxx.x.x.x.xx' ]
+// [ 'xx.x.x.xDxx\nxx.x.x.x.xx\nxx.x.x.x.xx\nxx.xBx.x.xx\nxx.x.xCx.xx\nxxAx.x.x.xx',
+//   'xx.x.x.x.xx\nxx.x.x.x.xx\nxxAx.x.x.xx\nxx.xBx.x.xx\nxx.x.xCx.xx\nxx.x.x.xDxx',
+//   'xx.x.xCx.xx\nxx.x.x.x.xx\nxx.x.x.x.xx\nxxAxBx.x.xx\nxx.x.x.x.xx\nxx.x.x.xDxx',
+//   'xx.x.xCx.xx\nxx.x.x.x.xx\nxx.xBx.xDxx\nxx.x.x.x.xx\nxxAx.x.x.xx\nxx.x.x.x.xx',
+//   'xx.x.xCx.xx\nxx.x.x.xDxx\nxx.x.x.x.xx\nxx.x.x.x.xx\nxxAxBx.x.xx\nxx.x.x.x.xx' ]
 
 export const findElevatorPath = (params: FindElevatorPathParams): string => {
     const {states, start, final} = params;
@@ -93,8 +53,6 @@ export const findElevatorPath = (params: FindElevatorPathParams): string => {
     const cleandUpStates = states.map((state) => {
         return state.replace(cleanUp, ''); 
     });
-
-    console.log(cleandUpStates);
 
     // Could determine floor level by index range
     // if index between 0 and 11 then its on the first floor
@@ -153,57 +111,168 @@ export const findElevatorPath = (params: FindElevatorPathParams): string => {
         D: Dfloors
     }
 
-    let steps:string [] = [];
-    const finalFloor = +final.charAt(0);
+    const elevators = Object.getOwnPropertyNames(positions);
+
+
+    let steps: string [] = new Array<string>();
+    let finalFloor = +final.charAt(0);
     let finalTime: number = +final.charAt(2);
     let currentElevator = start;
-    // checkForNextElevator(currentElevator, 0, positions, finalFloor);
+    let finalElevator: string = '';
 
-    // const nextPositions = _.omit(positions, ['A0']);
+    /*
+        Determine if a route can actually be found by checking if any 
+        of the elevators are on the right floor at the end time
+    */
+    let finalElevatorSearchRetry = 0;
+    let finalElevatorSearchLimit = 0;
+
+    for(let i = 0; i < elevators.length; i++) {
+        finalElevatorSearchLimit += positions[elevators[i]].length
+    }
+
+    for(let i = 0; i <= finalTime; i++) {
+        if(finalElevatorSearchRetry < finalElevatorSearchLimit) {
+            for (let k = 0; k < elevators.length; k++) {
+                if(positions[elevators[k]][finalTime - 1] === finalFloor) {
+                    finalElevator = elevators[k];
+                } else {
+                    finalElevatorSearchRetry += 1;
+                }
+            }
+        } else {
+            return 'NO SUCCESSFUL ROUTE';
+        }
+    }
+
+    console.log("The final elevator is elevator", finalElevator);
 
     /* 
-        Check every elevator, if we checked every elevator and there was no match stay in the same elevator.
+        Decision/Logic Notes
+        If we've checked every elevator and there was no match stay in the same elevator.
+        If there is another elevator on the same floor, should we get on it? 
+        Does the elevator you're going to get on ever overlap with the final elevator?
+        If not, stay on your current elevator.
     */
 
-    const elevators = Object.getOwnPropertyNames(positions);
-    // elevators.forEach((elevator) => {
-    //     console.log(elevator.localeCompare(currentElevator));
-    // })
     let retry = 0;
-    steps.push(currentElevator);
-    console.log(finalTime);
-    for(let i = 0; i <= finalTime; i++) {
+    let continueSearch = true;
+    for(let i = 0; i < finalTime; i++) {        // i is the time count/interval
 
+        /* If we are at the end of the path but we're not on the final floor at
+            the final time, then this was an invalid path
+         */
+        if((i === finalTime - 1) && positions[currentElevator][i] !== finalFloor) {
+            return 'NO SUCCESSFUL ROUTE';
+        }
+
+        /* If the elevator we've changed to is on the final floor, stop there
+        */
+        if((i === finalTime - 1) && (positions[currentElevator][i] === finalFloor)) {
+            console.log("We're on the final floor stay here");
+            steps.push(currentElevator);
+            continueSearch = false;
+            break;
+        }
+        continueSearch = true;
+        retry = 0;
+        console.log("\n-----------------------------------------------");
         console.log("The currentElevator is:", currentElevator, '\n');
-        for(let k = 0; k < elevators.length; k++) {
-            if(elevators[k].localeCompare(currentElevator) > 0) {
+        for(let k = 0; k < elevators.length; k++) {     // k is an interator to grab elevator names from our elevators array
+            // Not wanting to compare against the same elevator
+            if(elevators[k].localeCompare(currentElevator) != 0 && continueSearch) {
                 console.log("Comparing against elevator", elevators[k]);
-                if(retry === 3) {
-                    steps.push(currentElevator);
-                }
+                console.log("Retry count", retry);
                 if(positions[currentElevator][i] === positions[elevators[k]][i]) {
+                    // We have an elevator on our same floor, now decide if we should get in that elevator
                     console.log("Hitting match condition", positions[currentElevator][i], positions[elevators[k]][i]);
-                    console.log("Changing elevators to elevator", elevators[k]);
-                    steps.push(elevators[k]);
-                    currentElevator = elevators[k];
-                    // return currentElevator;
+                    console.log(i);
+                    for(let z = 0; z < positions[finalElevator].length - i; z++) { // z is a secondary iterator so we can check a potential elevator against the floors of the final elevator
+                        console.log("Made it into decision loop, z is", z);
+                        console.log(positions[elevators[k]][i + 1]);
+                        console.log(positions[finalElevator][i + 1]);
+                        if(elevators[k].localeCompare(finalElevator) === 0){
+                            console.log("Changing elevators to elevator because we're in the finalElevator", elevators[k]);
+                            steps.push(elevators[k]);
+                            currentElevator = elevators[k];
+                            continueSearch = false;
+                            break;
+                        }
+                        if(positions[elevators[k]][i + 1] === positions[finalElevator][i + 1]) { // z = 3;
+                            console.log("Changing elevators to elevator", elevators[k]);
+                            steps.push(elevators[k]);
+                            currentElevator = elevators[k];
+                            continueSearch = false;
+                            break;
+                        } else {
+                            currentElevator = currentElevator;
+                        }
+                    }    
                     break;
                 } 
                 else {
                     console.log("Hitting else condition", positions[currentElevator][i], positions[elevators[k]][i]);
                     currentElevator = currentElevator;
                     retry += 1;
+                    if(retry === 3) {
+                        steps.push(currentElevator);
+                        retry = 0;
+                        continueSearch = false;
+                        console.log("Staying in the currentElevator", currentElevator);
+                        break;
+                    }
                 }
             }
         }
-
     }
 
-    return steps.join(',');
+    console.log(steps.join(''));
+    return steps.join('');
 }
 
-console.log(findElevatorPath({
-    states: elevatorStates,
-    start: "A",
-    final: "5-5"
-}));
+
+/* If running with yarn start uncomment these*/
+
+// const elevatorStates: string[] = [
+//     // State @ t=1
+//     `xx.x.x.xDxx
+//      xx.x.x.x.xx
+//      xx.x.x.x.xx
+//      xx.xBx.x.xx
+//      xx.x.xCx.xx
+//      xxAx.x.x.xx`,
+//     // State @ t=2
+//     `xx.x.x.x.xx
+//      xx.x.x.x.xx
+//      xxAx.x.x.xx
+//      xx.xBx.x.xx
+//      xx.x.xCx.xx
+//      xx.x.x.xDxx`,
+//     // State @ t=3
+//     `xx.x.xCx.xx
+//      xx.x.x.x.xx
+//      xx.x.x.x.xx
+//      xxAxBx.x.xx
+//      xx.x.x.x.xx
+//      xx.x.x.xDxx`,
+//     // State @ t=4
+//     `xx.x.xCx.xx
+//      xx.x.x.x.xx
+//      xx.xBx.xDxx
+//      xx.x.x.x.xx
+//      xxAx.x.x.xx
+//      xx.x.x.x.xx`,
+//      // State @ t=5
+//     `xx.x.xCx.xx
+//      xx.x.x.xDxx
+//      xx.x.x.x.xx
+//      xx.x.x.x.xx
+//      xxAxBx.x.xx
+//      xx.x.x.x.xx`
+// ];
+
+// console.log(findElevatorPath({
+//     states: elevatorStates,
+//     start: "A",
+//     final: "5-5"
+// }));
