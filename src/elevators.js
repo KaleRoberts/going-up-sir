@@ -1,42 +1,6 @@
 "use strict";
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.findElevatorPath = void 0;
-/*
-    elevator.ts
-    Add solutions in here
-    Quick checks - are we already in the desired position?
-        - Can we even satisfy the condition given the state of the elevators?
-
-    Could work backwards from the known end
-    If you start in elevator A, and need to get to floor 5 by t=5 then
-    you wouldn't want to go back down to floor 1 because you'd run out
-    of steps to get to floor 5
-    But there could be issues with this approach
-
-    const path = ['A', 'D'];
-
-    Thought about trying to, "merge" the states/array indicies and give a given elevator coordinates
-    E.g.
-        xx.x.x.xDxx
-        xx.x.x.x.xx
-        xx.x.x.x.xx
-        xx.xBx.x.xx
-        xx.x.xCx.xx
-        xxAx.x.x.xx
-
-    Here A would be (1,1) where t=1 and A is on the first floor
-    C is (1, 2) again t=1 and C is on the second floor
-    B is (1, 3)
-
-    So if we were to, "merge" all of the states together we could possibly assign coordinates
-    to every elevator position
-
-
-*/
-const lodash_1 = __importDefault(require("lodash"));
 const elevatorStates = [
     // State @ t=1
     `xx.x.x.xDxx
@@ -83,7 +47,6 @@ const elevatorStates = [
     'xx.x.xCx.xx\nxx.x.x.xDxx\nxx.x.x.x.xx\nxx.x.x.x.xx\nxxAxBx.x.xx\nxx.x.x.x.xx'];
 exports.findElevatorPath = (params) => {
     const { states, start, final } = params;
-    const elevators = /ABCD/gi;
     const cleanUp = /[' ']/gis;
     // Flatten out the states
     const cleandUpStates = states.map((state) => {
@@ -123,89 +86,63 @@ exports.findElevatorPath = (params) => {
         }
         return floor;
     };
-    let positions = {};
-    // Is there another elevator on the same floor as me in the next time interval?
-    // If there isn't then you have to stay in the same elevator until there is another at your floor
-    // Current problem is that I can't check against the same time
-    // If there is an elevator at the same time on my current floor do you get in it?
-    const checkForNextElevator = (start, time, positions, finalFloor) => {
-        let nextElevator;
-        const nextPositions = lodash_1.default.omit(positions, [`${start}${time}`]);
-        for (const prop in nextPositions) {
-            if ((positions[`${start}${time}`] === nextPositions[`${prop.charAt(0)}${prop.charAt(1)}`])) {
-                console.log(`Checking`, `${start}${time}`, (positions[`${start}${time}`]), `${prop}`, (nextPositions[`${prop.charAt(0)}${prop.charAt(1)}`]));
-                console.log('The next elevator is', prop);
-                steps.push(prop);
-                nextElevator = prop;
-            }
-            else {
-                steps.push(`${start}${time}`);
-                nextElevator = `${start}${time}`;
-            }
-        }
-        // for(const prop in positions) {          
-        //     // if(prop !== `${start}${time}`) {    //Don't check the same key
-        //     // if((positions[`${start}${time}`] === positions[prop])){
-        //     //     delete(positions[prop]);
-        //     // }
-        //     const nextPositions = _.omit(positions, [`${currentElevator}${time}`]);
-        //     if((positions[`${start}${time}`] === nextPositions[`${prop}${time}`])) {
-        //         console.log(`Checking`, `${start}${time}`, (positions[`${start}${time}`]),  `${prop}`, (positions[prop]));
-        //         console.log('The next elevator is', prop);
-        //         steps.push(prop);
-        //         nextElevator = prop;    
-        //     } else {
-        //         steps.push(`${start}${time}`);
-        //         nextElevator = `${start}${time}`;
-        //     }
-        //     // if((positions[`${start}${time}`] === positions[prop])){
-        //     //     console.log(`Checking`, `${start}${time}`, (positions[`${start}${time}`]),  `${prop}`, (positions[prop]));
-        //     //     console.log('The next elevator is', prop);
-        //     //     steps.push(prop);
-        //     //     nextElevator = prop;    
-        //     // }
-        //     // } 
-        // }
-        return nextElevator;
-    };
-    // Time interval 1 is now 0
-    // Establish where each elevator is at a given time interval
+    const Afloors = new Array();
+    const Bfloors = new Array();
+    const Cfloors = new Array();
+    const Dfloors = new Array();
     for (let i = 0; i < cleandUpStates.length; i++) {
-        positions["A" + i] = mapFloor(cleandUpStates[i].indexOf("A"));
-        positions["B" + i] = mapFloor(cleandUpStates[i].indexOf("B"));
-        positions["C" + i] = mapFloor(cleandUpStates[i].indexOf("C"));
-        positions["D" + i] = mapFloor(cleandUpStates[i].indexOf("D"));
+        Afloors.push(mapFloor(cleandUpStates[i].indexOf("A")));
+        Bfloors.push(mapFloor(cleandUpStates[i].indexOf("B")));
+        Cfloors.push(mapFloor(cleandUpStates[i].indexOf("C")));
+        Dfloors.push(mapFloor(cleandUpStates[i].indexOf("D")));
     }
-    /*
-        I think working backwards might be the best approach
-        Compare final parameter <floor>-<time> to our floors+times object and see which elevator is there
-        We want to know which elevator(s) is/are on a particular floor
-    */
+    const positions = {
+        A: Afloors,
+        B: Bfloors,
+        C: Cfloors,
+        D: Dfloors
+    };
     let steps = [];
     const finalFloor = +final.charAt(0);
     let finalTime = +final.charAt(2);
-    finalTime = finalTime - 1;
-    steps.push(start);
     let currentElevator = start;
     // checkForNextElevator(currentElevator, 0, positions, finalFloor);
     // const nextPositions = _.omit(positions, ['A0']);
-    // console.log(nextPositions);
-    for (let time = 0; time < finalTime; time++) {
-        currentElevator = checkForNextElevator(currentElevator, time, positions, finalFloor);
+    /*
+        Check every elevator, if we checked every elevator and there was no match stay in the same elevator.
+    */
+    const elevators = Object.getOwnPropertyNames(positions);
+    // elevators.forEach((elevator) => {
+    //     console.log(elevator.localeCompare(currentElevator));
+    // })
+    let retry = 0;
+    steps.push(currentElevator);
+    console.log(finalTime);
+    for (let i = 0; i <= finalTime; i++) {
+        console.log("The currentElevator is:", currentElevator, '\n');
+        for (let k = 0; k < elevators.length; k++) {
+            if (elevators[k].localeCompare(currentElevator) > 0) {
+                console.log("Comparing against elevator", elevators[k]);
+                if (retry === 3) {
+                    steps.push(currentElevator);
+                }
+                if (positions[currentElevator][i] === positions[elevators[k]][i]) {
+                    console.log("Hitting match condition", positions[currentElevator][i], positions[elevators[k]][i]);
+                    console.log("Changing elevators to elevator", elevators[k]);
+                    steps.push(elevators[k]);
+                    currentElevator = elevators[k];
+                    // return currentElevator;
+                    break;
+                }
+                else {
+                    console.log("Hitting else condition", positions[currentElevator][i], positions[elevators[k]][i]);
+                    currentElevator = currentElevator;
+                    retry += 1;
+                }
+            }
+        }
     }
-    // if(positions[`${start}`+ `${i + 1}`] getStartingFloor(start,positions))
-    // What is the elevator in the last position?
-    // for(const prop in positions) {
-    //     console.log(`${prop} : ${positions[prop]}`);
-    //     if(positions[prop] === finalFloor) {
-    //         console.log(`The final elevator is ${prop} on floor ${finalFloor}`)
-    //     }
-    // }
-    // Then it becomes how to get from A to D?
-    // console.log(positions[`A`+`${finalTime - 1}`]);
-    // if(state[`${finalElevator}+${finalTime - 1}`]) {
-    // }
-    return steps.join();
+    return steps.join(',');
 };
 console.log(exports.findElevatorPath({
     states: elevatorStates,

@@ -89,7 +89,6 @@ elevatorStates = [
   xx.x.x.x.xx`,
 ]
 
-
 startingElevator = "A"
 finalDestination = "5-5"
 
@@ -97,28 +96,10 @@ Sample Output:
 "AABDD"
 
 
-    /*
-    Quick representation of what our positions object looks like
-        state {
-          A0 : 1
-          B0 : 3
-          C0 : 2
-          D0 : 6
-          A1 : 4
-          B1 : 3
-          C1 : 2
-          D1 : 1
-          A2 : 3
-          B2 : 3
-          C2 : 6
-          D2 : 1
-          A3 : 2
-          B3 : 4
-          C3 : 6
-          D3 : 4
-          A4 : 2
-          B4 : 2
-          C4 : 6
-          D4 : 5
-        }
-    */
+## Quick representation of what our positions object looks like
+{
+  A: [ 1, 4, 3, 2, 2 ],
+  B: [ 3, 3, 3, 4, 2 ],
+  C: [ 2, 2, 6, 6, 6 ],
+  D: [ 6, 1, 1, 4, 5 ]
+}
