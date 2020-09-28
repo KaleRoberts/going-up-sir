@@ -91,10 +91,10 @@ exports.findElevatorPath = (params) => {
             }
         }
         else {
+            console.log('NO SUCCESSFUL ROUTE');
             return 'NO SUCCESSFUL ROUTE';
         }
     }
-    console.log("The final elevator is elevator", finalElevator);
     /*
         Decision/Logic Notes
         If we've checked every elevator and there was no match stay in the same elevator.
@@ -109,43 +109,31 @@ exports.findElevatorPath = (params) => {
             the final time, then this was an invalid path
          */
         if ((i === finalTime - 1) && positions[currentElevator][i] !== finalFloor) {
+            console.log('NO SUCCESSFUL ROUTE');
             return 'NO SUCCESSFUL ROUTE';
         }
-        /* If the elevator we've changed to is on the final floor
-           stop pathing
+        /* If the elevator we've changed to is on the final floor, stop there
         */
         if ((i === finalTime - 1) && (positions[currentElevator][i] === finalFloor)) {
-            console.log("We're on the final floor stay here");
             steps.push(currentElevator);
             continueSearch = false;
             break;
         }
         continueSearch = true;
         retry = 0;
-        console.log("\n-----------------------------------------------");
-        console.log("The currentElevator is:", currentElevator, '\n');
         for (let k = 0; k < elevators.length; k++) { // k is an interator to grab elevator names from our elevators array
             // Not wanting to compare against the same elevator
             if (elevators[k].localeCompare(currentElevator) != 0 && continueSearch) {
-                console.log("Comparing against elevator", elevators[k]);
-                console.log("Retry count", retry);
                 if (positions[currentElevator][i] === positions[elevators[k]][i]) {
-                    // We have an elevator on our same floor, now decide if we should get in that elevator
-                    console.log("Hitting match condition", positions[currentElevator][i], positions[elevators[k]][i]);
-                    console.log(i);
+                    // We have an elevator on our same floor, now we decide if we should get in that elevator
                     for (let z = 0; z < positions[finalElevator].length - i; z++) { // z is a secondary iterator so we can check a potential elevator against the floors of the final elevator
-                        console.log("Made it into decision loop, z is", z);
-                        console.log(positions[elevators[k]][i + 1]);
-                        console.log(positions[finalElevator][i + 1]);
                         if (elevators[k].localeCompare(finalElevator) === 0) {
-                            console.log("Changing elevators to elevator because we're in the finalElevator", elevators[k]);
                             steps.push(elevators[k]);
                             currentElevator = elevators[k];
                             continueSearch = false;
                             break;
                         }
                         if (positions[elevators[k]][i + 1] === positions[finalElevator][i + 1]) { // z = 3;
-                            console.log("Changing elevators to elevator", elevators[k]);
                             steps.push(elevators[k]);
                             currentElevator = elevators[k];
                             continueSearch = false;
@@ -155,19 +143,16 @@ exports.findElevatorPath = (params) => {
                             currentElevator = currentElevator;
                         }
                     }
-                    // steps.push(elevators[k]);
-                    // currentElevator = elevators[k];
                     break;
                 }
                 else {
-                    console.log("Hitting else condition", positions[currentElevator][i], positions[elevators[k]][i]);
                     currentElevator = currentElevator;
                     retry += 1;
                     if (retry === 3) {
+                        /* If we've checked all other elevators and couldn't find another on our floor then stay */
                         steps.push(currentElevator);
                         retry = 0;
                         continueSearch = false;
-                        console.log("Staying in the currentElevator", currentElevator);
                         break;
                     }
                 }

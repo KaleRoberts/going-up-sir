@@ -1,11 +1,16 @@
 # going-up-sir
 Elevator traversal
 
-# How to run/start
-yarn start or npm start
+https://youtu.be/20lcB9c-Qa0
 
-# How to test
-yarn test or npm test
+# How to run/start/test
+```yarn test``` or ```npm test```
+
+# Just running yarn start
+```yarn start``` or ```npm start```
+You'll need to uncomment the end of elevators.ts
+if you just want to run through a single state. Or you can edit the tests
+and run ```yarn test```
 
 
 ## The Elevator Problem
@@ -103,3 +108,12 @@ Sample Output:
   C: [ 2, 2, 6, 6, 6 ],
   D: [ 6, 1, 1, 4, 5 ]
 }
+
+
+## Pitfalls and additions with more time
+**Does not handle the case of 3 elevators being on the same floor at the same time.
+I would need to write additional logic to check all matches for overlap with the final elevator and then make a decision about that.
+
+Order of magnitude is linear but somewhat high for this considering the use of nested loops and that we have to sometimes check against all other indicies of the positions array. I think we end up at O(3n) for our Big-O 
+
+Floor mapping is not as dynamic as I would've liked, the mapFloor method is hardcoded against the cleaned up elevator states. Improvements could be made here to make the overall method more flexible and handle any array (using some marker for new floors such as the newline that already exists in our examples here.)
