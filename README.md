@@ -4,6 +4,10 @@ Elevator traversal
 https://youtu.be/20lcB9c-Qa0
 
 # How to run/start/test
+Run ```npm install``` to get all those nice dependencies
+Or if you have yarn installed ```yarn install```
+
+Then run the jasmine tests:
 ```yarn test``` or ```npm test```
 
 # Just running yarn start
@@ -110,7 +114,7 @@ Sample Output:
 }
 
 
-## Pitfalls and additions with more time
+## Pitfalls, limitations and additions with more time
 **Does not handle the case of 3 elevators being on the same floor at the same time.
 I would need to write additional logic to check all matches for overlap with the final elevator and then make a decision about that.
 

@@ -10,24 +10,9 @@
     of steps to get to floor 5
     But there could be issues with this approach
 
-    const path = ['A', 'D'];
-
     Thought about trying to, "merge" the states/array indicies and give a given elevator coordinates
-    E.g.
-        xx.x.x.xDxx
-        xx.x.x.x.xx
-        xx.x.x.x.xx
-        xx.xBx.x.xx
-        xx.x.xCx.xx
-        xxAx.x.x.xx
-
-    Here A would be (1,1) where t=1 and A is on the first floor
-    C is (1, 2) again t=1 and C is on the second floor
-    B is (1, 3)
-
     So if we were to, "merge" all of the states together we could possibly assign coordinates
     to every elevator position
-
 
 */
 export interface FindElevatorPathParams {
@@ -113,7 +98,6 @@ export const findElevatorPath = (params: FindElevatorPathParams): string => {
 
     const elevators = Object.getOwnPropertyNames(positions);
 
-
     let steps: string [] = new Array<string>();
     let finalFloor = +final.charAt(0);
     let finalTime: number = +final.charAt(2);
@@ -188,7 +172,7 @@ export const findElevatorPath = (params: FindElevatorPathParams): string => {
                             continueSearch = false;
                             break;
                         }
-                        if(positions[elevators[k]][i + 1] === positions[finalElevator][i + 1]) { // z = 3;
+                        if(positions[elevators[k]][i + 1] === positions[finalElevator][i + 1]) {
                             steps.push(elevators[k]);
                             currentElevator = elevators[k];
                             continueSearch = false;
